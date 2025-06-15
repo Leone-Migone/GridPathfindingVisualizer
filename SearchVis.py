@@ -100,7 +100,7 @@ def BFS():
     queue = [start]
     start.visited = True
 
-    directions = [(1,0),(-1,0),(0,1),(0,-1)]
+    directions = [(0,-1), (1,0), (0,1), (-1,0)]
 
     while queue:  
         current = queue.pop(0)
