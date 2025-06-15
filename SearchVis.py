@@ -14,7 +14,7 @@ WHITE = (200, 200, 200)
 RED = (255,0,0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-
+directions = [(0,-1), (1,0), (0,1), (-1,0)]
 blocksize = 30
 cols = rows = 600 // blocksize
 
@@ -36,12 +36,14 @@ def main():
                 pos = pg.mouse.get_pos()
                 clickedRect(pos)
             elif event.type == pg.KEYUP:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_1:
                    BFS() 
-
+                elif event.key == pg.K_2:
+                    DFS()
         
         screen.fill(BLACK)
         draw()
+        
         pg.display.update()
         clock.tick(60)
 
@@ -88,19 +90,13 @@ def BFS():
     if (len(targetNodes) < 2):
         print("need atleast a starting and target node in order to use a pathfinding algorithm")
         return
-    
     start = targetNodes[0]
     end = targetNodes[1]
-    #reset nodes to not visited
-    for row in nodeList:
-        for node in row:
-            node.visited = False
-            node.parent = None 
+
+    initializeSearch()
     
     queue = [start]
     start.visited = True
-
-    directions = [(0,-1), (1,0), (0,1), (-1,0)]
 
     while queue:  
         current = queue.pop(0)
@@ -120,11 +116,49 @@ def BFS():
                     neighbor.parent = current
                     queue.append(neighbor)
 
+def DFS():
+    if (len(targetNodes) < 2):
+        print("need atleast a starting and target node in order to use a pathfinding algorithm")
+        return
+    
+    start = targetNodes[0]
+    end = targetNodes[1]
+    initializeSearch()
+
+    stack = [start]
+    start.visited = True
+
+    while stack:
+        current = stack.pop()
+        x, y = int(current.coordinates.x), int(current.coordinates.y)  
+        if current == end:
+            print("target reached")
+            trace_path(end)
+            return
+
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < cols and 0 <= ny < rows:
+                neighbor = nodeList[nx][ny]
+                if not neighbor.visited:
+                    neighbor.visited = True
+                    neighbor.parent = current
+                    stack.append(neighbor)
+
+
+
 def trace_path(end_node):
     current = end_node.parent 
     while current and not current.target:
         current.weight = -2  
         current = current.parent
 
+def initializeSearch(): 
+    for row in nodeList:
+        for node in row:
+            node.visited = False
+            node.parent = None 
+
 if __name__ == "__main__":
     main()
+
