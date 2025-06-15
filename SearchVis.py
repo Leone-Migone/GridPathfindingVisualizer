@@ -12,15 +12,14 @@ BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
 RED = (255,0,0)
 blocksize = 30
-nodeList = {}
+cols = rows = 600 // blocksize
 
 def main():
     pg.init()
-    global screen, clock
+    global screen, clock, nodeList
     screen = pg.display.set_mode((600, 600))
     clock = pg.time.Clock()
     
-    global nodeList
     nodeList = gridlist()
 
     running = True
@@ -41,30 +40,32 @@ def main():
 
 def clickedRect(pos):
     cord = posToNode(pos)
-    key = (cord.x, cord.y)
-    if key in nodeList:
-        nodeList[key].target = True
+    x, y = int(cord.x), int(cord.y)
+    if 0 <= x < cols and 0 <= y < rows:
+        nodeList[x][y].target = True
 
 def gridlist():
-    nodelist = {}
-    for x in range(0, 600, blocksize):
-        for y in range(0, 600, blocksize):
-            rect = pg.Rect(x, y, blocksize, blocksize)
-            cord = posToNode((x, y))
-            n1 = Node(rect, False, -1, cord, False)
-            nodelist[(cord.x, cord.y)] = n1
-    return nodelist
+    grid = [[None for _ in range(rows)] for _ in range(cols)]
+    for x in range(cols):
+        for y in range(rows):
+            px, py = x * blocksize, y * blocksize
+            rect = pg.Rect(px, py, blocksize, blocksize)
+            coord = pg.math.Vector2(x, y)
+            grid[x][y] = Node(rect, False, -1, coord, False)
+    return grid
 
 def draw():
-    for node in nodeList.values():
-        color = RED if node.target else WHITE
-        pg.draw.rect(screen, color, node.rect, 1)
+    for row in nodeList:
+        for node in row:
+            color = RED if node.target else WHITE
+            pg.draw.rect(screen, color, node.rect, 1)
 
 def posToNode(pos):
     x, y = pos
-    x = x // blocksize
-    y = y // blocksize
-    return pg.math.Vector2(x, y)
+    return pg.math.Vector2(x // blocksize, y // blocksize)
+
+
+
 
 if __name__ == "__main__":
     main()
