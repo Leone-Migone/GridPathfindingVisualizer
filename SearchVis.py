@@ -8,12 +8,14 @@ class Node:
         self.coordinates = coordinates
         self.target = target
         self.parent = None
+        self.wall = False
 
 BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
 RED = (255,0,0)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
+GIALLO = (255, 255 , 51)
 directions = [(0,-1), (1,0), (0,1), (-1,0)]
 blocksize = 30
 cols = rows = 600 // blocksize
@@ -34,11 +36,15 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
-            elif event.type == pg.MOUSEBUTTONUP and targetcount<2:
-                pos = pg.mouse.get_pos()
-                targetcount+=1
-                clickedRect(pos)
-                
+            elif event.type == pg.MOUSEBUTTONUP:
+                if event.button == 1 and targetcount<2:
+                    pos = pg.mouse.get_pos()
+                    clickedRect(pos)
+                    targetcount+=1
+                elif event.button == 3:
+                    pos = pg.mouse.get_pos()
+                    addremoveWall(pos)
+                    
             elif event.type == pg.KEYUP:
                 if alreadysearched == True:
                    alreadysearched = False
@@ -69,6 +75,14 @@ def clickedRect(pos):
         nodeList[x][y].target = True
         targetNodes.append(nodeList[x][y])
 
+def addremoveWall(pos):
+    cord = posToNode(pos)
+    x, y = int(cord.x), int(cord.y)
+    if 0 <= x < cols and 0 <= y < rows:
+        if nodeList[x][y].wall == False:
+            nodeList[x][y].wall = True
+        else:
+            nodeList[x][y].wall = False
 
 def gridlist():
     grid = [[None for _ in range(rows)] for _ in range(cols)]
@@ -83,7 +97,9 @@ def gridlist():
 def draw():
     for row in nodeList:
         for node in row:
-            if node.target:
+            if node.wall:
+                color = GIALLO
+            elif node.target:
              color = RED
             elif node.weight == -2:  
                color = GREEN
@@ -92,7 +108,7 @@ def draw():
             
             else:
               color = WHITE
-            pg.draw.rect(screen, color, node.rect, 1)
+            pg.draw.rect(screen, color, node.rect, 2)
 
 def posToNode(pos):
     x, y = pos
@@ -124,7 +140,7 @@ def BFS():
             nx, ny = x + dx, y + dy
             if 0 <= nx < cols and 0 <= ny < rows:
                 neighbor = nodeList[nx][ny]
-                if not neighbor.visited:
+                if not neighbor.visited and not neighbor.wall:
                     neighbor.visited = True
                     neighbor.parent = current
                     queue.append(neighbor)
@@ -154,7 +170,7 @@ def DFS():
             nx, ny = x + dx, y + dy
             if 0 <= nx < cols and 0 <= ny < rows:
                 neighbor = nodeList[nx][ny]
-                if not neighbor.visited:
+                if not neighbor.visited and not neighbor.wall:
                     neighbor.visited = True
                     neighbor.parent = current
                     stack.append(neighbor)
