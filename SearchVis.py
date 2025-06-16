@@ -27,6 +27,7 @@ def main():
     global screen, clock, nodeList, targetNodes
     screen = pg.display.set_mode((600, 600))
     clock = pg.time.Clock()
+    searchgen = None
     
     nodeList = gridlist()
     targetNodes = []
@@ -54,11 +55,18 @@ def main():
                        
                 elif event.key == pg.K_1 and targetcount == 2:
                    alreadysearched = True
-                   BFS()
+                   searchgen = BFS()
                     
                 elif event.key == pg.K_2 and targetcount == 2:
                     alreadysearched = True
-                    DFS()
+                    searchgen = DFS()
+        
+        
+        if searchgen:
+            try:
+                next(searchgen)
+            except StopIteration:
+                searchgen = None
         
         screen.fill(BLACK)
         draw()
@@ -133,7 +141,7 @@ def BFS():
 
         if current == end:
             print("target reached")
-            trace_path(end)
+            yield from trace_path(end)
             return
 
         for dx, dy in directions:
@@ -144,6 +152,7 @@ def BFS():
                     neighbor.visited = True
                     neighbor.parent = current
                     queue.append(neighbor)
+        yield
 
 def DFS():
     if (len(targetNodes) < 2):
@@ -163,7 +172,7 @@ def DFS():
         x, y = int(current.coordinates.x), int(current.coordinates.y)  
         if current == end:
             print("Reached end at", current.coordinates)
-            trace_path(end)
+            yield from trace_path(end)
             return
 
         for dx, dy in directions:
@@ -174,13 +183,14 @@ def DFS():
                     neighbor.visited = True
                     neighbor.parent = current
                     stack.append(neighbor)
-
+        yield
 
 
 def trace_path(end_node):
     current = end_node.parent 
     while current and not current.target:
         current.weight = -2  
+        yield
         current = current.parent
 
 def initializeSearch(): 
