@@ -5,7 +5,8 @@ This is a simple pathfinding visualizer built using Python and Pygame. It demons
 ## Features
 
 - Interactive 20×20 grid (each block is 30×30 pixels in 600x600 pixels window)
-- Click to set **start** and **end** nodes (max 2 targets)
+- Click left mouse button to set **start** and **end** nodes (max 2 targets)
+- Click the right mouse button to **add** or **remove** (if already present) wall cells on the grid
 - Press `1` to visualize BFS
 - Press `2` to visualize DFS
 - Press any key after you have done a search to reset the grid
@@ -13,7 +14,7 @@ This is a simple pathfinding visualizer built using Python and Pygame. It demons
   - **Red** squares as start/end targets
   - **Blue** squares as visited nodes
   - **Green** squares as part of the final path
-
+  - **Yellow** squares as walls
 ## How to Run
 
 1. Ensure you have Python 3 installed.
@@ -34,6 +35,7 @@ Stores information about each cell in the grid:
 - `coordinates`: Position in grid
 - `target`: Whether it's a start/end point
 - `parent`: Used for backtracking the path
+- `wall`: Used for marking wall cells of the grid
 
 ---
 
@@ -46,3 +48,4 @@ Stores information about each cell in the grid:
 - `BFS()` / `DFS()`: Runs Breadth-First Search or Depth-First Search.
 - `trace_path(end_node)`: Traces the path from end to start using `.parent`.
 - `resetGrid()`: Resets all nodes for a new search.
+- `addremoveWall(pos)`: Add or remove wall cells.
