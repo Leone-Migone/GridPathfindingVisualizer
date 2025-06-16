@@ -19,6 +19,8 @@ blocksize = 30
 cols = rows = 600 // blocksize
 
 def main():
+    targetcount = 0
+    alreadysearched = False
     pg.init()
     global screen, clock, nodeList, targetNodes
     screen = pg.display.set_mode((600, 600))
@@ -32,13 +34,24 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
-            elif event.type == pg.MOUSEBUTTONUP:
+            elif event.type == pg.MOUSEBUTTONUP and targetcount<2:
                 pos = pg.mouse.get_pos()
+                targetcount+=1
                 clickedRect(pos)
+                
             elif event.type == pg.KEYUP:
-                if event.key == pg.K_1:
-                   BFS() 
-                elif event.key == pg.K_2:
+                if alreadysearched == True:
+                   alreadysearched = False
+                   targetcount = 0
+                   targetNodes = []
+                   resetGrid()
+                       
+                elif event.key == pg.K_1 and targetcount == 2:
+                   alreadysearched = True
+                   BFS()
+                    
+                elif event.key == pg.K_2 and targetcount == 2:
+                    alreadysearched = True
                     DFS()
         
         screen.fill(BLACK)
@@ -130,9 +143,10 @@ def DFS():
 
     while stack:
         current = stack.pop()
+        print("Visiting:", current.coordinates)
         x, y = int(current.coordinates.x), int(current.coordinates.y)  
         if current == end:
-            print("target reached")
+            print("Reached end at", current.coordinates)
             trace_path(end)
             return
 
@@ -158,6 +172,17 @@ def initializeSearch():
         for node in row:
             node.visited = False
             node.parent = None 
+            
+            
+def resetGrid():
+    for row in nodeList:
+        for node in row:
+            node.visited = False
+            node.parent = None 
+            node.weight = 0
+            node.target = False
+   
+
 
 if __name__ == "__main__":
     main()
